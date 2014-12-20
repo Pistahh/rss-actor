@@ -1,0 +1,45 @@
+# Where to download the rss from
+channel: http://showrss.info/rss.php?user_id=9876543210&hd=1&proper=1
+# The local id of this channel. It is used to generate the name of the "seen" file.
+id: showrss
+# variables that can be referred to later.
+vars:
+    - name: cmd
+      value: /usr/bin/transmission-remote
+    - name: mailto
+      value: my@mail.address
+    - name: downloaddir
+      value: /data/downloads
+    - name: mailbody
+      value: |
+        From: RSS-Actor
+        Subject: Queued "%title%" for download
+        
+        Queued "%title%".
+match:
+# The dpath of the variable we want to check
+    - var: /title
+# What to look in the title. More filtering is possible here too.
+      regexp: '.'
+# Other variables that can be used
+      vars:
+          - name: url
+            dpath: /enclosure/url
+          - name: title
+            dpath: /title
+# What to do if we have an unseen item
+      do:
+# We just print this to the terminal
+         - action: print
+           print: "Downloading %title% (%url%)\n"
+# Queue it for download
+         - action: exec
+           cmd: [ "%cmd%", "-w", "%downloaddir%", "-a",  "%url%" ]
+# Send a mail about it
+         - action: exec
+           cmd: "/bin/echo '%mailbody%' | /usr/sbin/dma %mailto%"
+# This is to help figuring out which value is where
+#    - var: /title
+#      regexp: '.'
+#      do:
+#        - action: dump
