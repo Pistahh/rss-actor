@@ -186,7 +186,9 @@ sub process_config {
                         $cmd = [ $cmd ] if ref $cmd eq "";
                         my @ecmd = map { get_val(\@lvars, $_, $item) } @$cmd;
                         DEBUG($NOEXEC ? "NOT" : "", "Executing:", join (" ", @ecmd), "\n");
-                        system(@ecmd) unless $NOEXEC;
+                        if (!$NOEXEC) {
+                            system(@ecmd) == 0 || die "Exec @ecmd failed: $?"
+                        }
                     }
                     when (/^dump$/) {
                         print Dumper($item);
