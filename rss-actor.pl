@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
+use v5.14;
+
 use strict;
 use warnings;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-use Switch;
 use XML::RSS;
 use LWP::Simple 'get';
 use Data::Dumper;
@@ -175,22 +176,22 @@ sub process_config {
 
             my @lvars=(@$vars, @$mvars);
             for my $do ( @{$match->{do}} ) {
-                switch ($do->{action}) {
-                    case "print" {
+                given ($do->{action}) {
+                    when (/^print$/) {
                         my $str = get_val(\@lvars, $do->{print}, $item);
                         print "$str\n";
                     }
-                    case "exec" {
+                    when (/^exec$/) {
                         my $cmd = $do->{cmd};
                         $cmd = [ $cmd ] if ref $cmd eq "";
                         my @ecmd = map { get_val(\@lvars, $_, $item) } @$cmd;
                         DEBUG($NOEXEC ? "NOT" : "", "Executing:", join (" ", @ecmd), "\n");
                         system(@ecmd) unless $NOEXEC;
                     }
-                    case "dump" {
+                    when (/^dump$/) {
                         print Dumper($item);
                     }
-                    else {
+                    default {
                         die "Uknown action: '$do->{action}'\n";
                     }
                 }
