@@ -165,7 +165,7 @@ sub process_config {
                 next;
             }
             if ($match->{noregexp} && $val =~ /$match->{noregexp}/) {
-                DEBUG("Ingnore match, ignoring: $val\n");
+                DEBUG("Ignore match, ignoring: $val\n");
                 next;
             }
 
