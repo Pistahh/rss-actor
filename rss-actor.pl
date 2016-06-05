@@ -118,7 +118,7 @@ sub process_config {
     };
 
     if ($@) {
-        print STDERR "Could not load config from $fname: $!\n";
+        print STDERR "Could not load config from $fname: $@\n";
         return;
     }
 
