@@ -143,6 +143,8 @@ sub process_config {
 
     $rss->parse($xml);
 
+    mkdir $SEEN_DIR || die "Could not create directory $SEEN_DIR: $?";
+
     my $seen = read_seen($config->{id});
 
     foreach my $item (@{$rss->{'items'}}) {
@@ -153,10 +155,7 @@ sub process_config {
             next;
         }
 
-        push @$seen, $title;
-
         DEBUG("New in channel: $title\n");
-
 
         for my $match ( @{$config->{match}}) {
             my $vals = $item ~~ dpath $match->{dpath};
@@ -198,10 +197,9 @@ sub process_config {
                     }
                 }
             }
+            push @$seen, $title;
+            write_seen($config->{id}, $seen);
         }
     }
-
-    mkdir $SEEN_DIR || die "Could not create directory $SEEN_DIR: $?";
-    write_seen($config->{id}, $seen);
 }
 
